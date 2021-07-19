@@ -2,7 +2,7 @@
 """Do a generic scatter plot.
 
 Usage:
-  %s <inputFile>... [--x=<x>] [--y=<y>] [--yerror=<yerror>] [--xlower=<xlower>] [--xupper=<xupper>] [--ylower=<ylower>] [--yupper=<yupper>] [--outputFile=<file>] [--threshold=<threshold>] [--log] [--xlabel=<xlabel>] [--ylabel=<ylabel>] [--xmajorticks=<xmajorticks>] [--xminorticks=<xminorticks>] [--ymajorticks=<ymajorticks>] [--yminorticks=<yminorticks>] [--plotlabel=<plotlabel>] [--plotlabelpos=<plotlabelpos>] [--panellabel=<panellabel>] [--panellabelpos=<panellabelpos>] [--alpha=<alpha>] [--pointsize=<pointsize>] [--mjdXaxis] [--addSecondaryTimeXAxis] [--grid] [--colour=<colour>] [--invert] [--tight] [--figsize=<figsize>] [--header=<header>] [--normalise] [--line] [--error] [--errorthick=<errorthick>]
+  %s <inputFile>... [--x=<x>] [--y=<y>] [--yerror=<yerror>] [--xlower=<xlower>] [--xupper=<xupper>] [--ylower=<ylower>] [--yupper=<yupper>] [--outputFile=<file>] [--threshold=<threshold>] [--log] [--xlabel=<xlabel>] [--ylabel=<ylabel>] [--xmajorticks=<xmajorticks>] [--xminorticks=<xminorticks>] [--ymajorticks=<ymajorticks>] [--yminorticks=<yminorticks>] [--plotlabel=<plotlabel>] [--plotlabelpos=<plotlabelpos>] [--panellabel=<panellabel>] [--panellabelpos=<panellabelpos>] [--alpha=<alpha>] [--pointsize=<pointsize>] [--mjdXaxis] [--addSecondaryTimeXAxis] [--grid] [--colour=<colour>] [--invert] [--tight] [--figsize=<figsize>] [--header=<header>] [--normalise] [--line] [--error] [--errorthick=<errorthick>] [--delimiter=<delimiter>]
   %s (-h | --help)
   %s --version
 
@@ -43,6 +43,7 @@ Options:
   --invert                          invert y axis.
   --tight                           tight layout.
   --figsize=<figsize>               figure size, comma separated, no spaces [default: 6,3]
+  --delimiter=<delimiter>           Delimiter to use [default: ,].
 
 E.g.:
    %s ~/atlas/dophot/ATLAS20ymv_dophot_o.txt ~/atlas/dophot/ATLAS20ymv_dophot_c.txt --x=mjd --y=mag --yerror=dminst --invert --xlower=59070 --xupper=59200 --ylower=15.5 --yupper=18.5 --tight --alpha=1 --pointsize=2 --xmajorticks=20 --xminorticks=2 --outputFile=/tmp/ATLAS20ymv_lc.png --error
@@ -203,7 +204,7 @@ def doPlots(options):
         fieldnames = options.header.split()
     for datafile in options.inputFile:
         data = {}
-        dataRows = readGenericDataFile(datafile, delimiter=' ', fieldnames=fieldnames)
+        dataRows = readGenericDataFile(datafile, delimiter=options.delimiter, fieldnames=fieldnames)
 
         x = []
         y = []
