@@ -27,9 +27,14 @@ Options:
   --alpha=<alpha>              transparency setting - comma separated no spaces if more than one alpha [default: 0.5]
   --log                        Plot log(y) instead of y.
   --leglabels=<leglabels>      Legend labels (alternative to using the columns).
+
+  e.g.:
+
+  %s ~/Documents/atlas/transient_paper/ztf_supernovae_2019.tsv ~/Documents/atlas/transient_paper/atlas_supernovae_2019.tsv ~/Documents/atlas/transient_paper/asassn_supernovae_2019.tsv --delimiter=$'\\t' --column=z --xlabel="redshift (z)" --ylabel=Number --binwidth=0.01 --binlower=0.0 --binupper=0.4 --majorticks=0.1 --minorticks=0.01 --colour=orange,red,blue --alpha=0.3,0.4,0.6 --outputFile=/tmp/zcomparison_2019.pdf --leglabels=ZTF,ATLAS,ASAS-SN
+  
 """
 import sys
-__doc__ = __doc__ % (sys.argv[0], sys.argv[0], sys.argv[0])
+__doc__ = __doc__ % (sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0])
 from docopt import docopt
 import os, shutil, re, csv, subprocess
 from gkutils.commonutils import Struct, cleanOptions, readGenericDataFile
