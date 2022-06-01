@@ -111,7 +111,7 @@ def doPlot(options, objects, plotNumber = 111, alpha = 0.2, minMJD = 0.0, maxMJD
         #if dec > -9.0 and dec < -8.0:
         #if mjd > 57053: # January 31st
         #if mjd > 57174: # June 1st
-        if mjd > minMJD and mjd < maxMJD:
+        if mjd is not None and mjd > minMJD and mjd < maxMJD:
             if row[options.filtercol][0] == 'g':
                 gx.append(ra)
                 gy.append(dec)
