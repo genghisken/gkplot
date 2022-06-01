@@ -13,7 +13,7 @@ Options:
   --title=<title>                           Plot title.
   --heatmapresolution=<heatmapresolution>   Heatmap resolution as a power of 2 between 8 and 512 [default: 128].
   --delimiter=<delimiter>                   Delimiter to use [default: \\t].
-  --medianMultiplier=<medianMultiplier>     Multiplier for the Median for the colorbar and cuts [default: 1.2].
+  --medianMultiplier=<medianMultiplier>     Multiplier for the Median for the colorbar and cuts [default: 1.5].
   --grid                                    Display a grid.
   --colorbar                                Display a colour bar.
   --horizontal                              Show the colour bar horizontally (ignored if colourbar not displayed).
