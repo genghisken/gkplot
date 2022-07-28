@@ -2,7 +2,7 @@
 """Plot an ATLAS detector heatmap from an input file - or import the plotHeatMap function. Input file needs headed rows called x and y.
 
 Usage:
-  %s <filename> [--outputFile=<file>] [--title=<title>] [--heatmapresolution=<heatmapresolution] [--delimiter=<delimiter>] [--medianMultiplier=<medianMultiplier>] [--grid] [--colorbar] [--mask] [--horizontal]
+  %s <filename> [--outputFile=<file>] [--title=<title>] [--heatmapresolution=<heatmapresolution>] [--delimiter=<delimiter>] [--medianMultiplier=<medianMultiplier>] [--grid] [--colorbar] [--mask] [--horizontal]
   %s (-h | --help)
   %s --version
 
@@ -23,7 +23,7 @@ import sys
 __doc__ = __doc__ % (sys.argv[0], sys.argv[0], sys.argv[0])
 from docopt import docopt
 import os, MySQLdb, shutil, re, csv, subprocess
-from gkutils.commonutils import Struct, cleanOptions, readGenericDataFile, transform, J2000toGalactic
+from gkutils.commonutils import Struct, cleanOptions, readGenericDataFile, transform, J2000toGalactic, calculateHeatMap
 import numpy as n
 import matplotlib.pyplot as plt
 import matplotlib.ticker as plticker
@@ -46,6 +46,21 @@ plt.rcParams["font.family"] = "serif"
 plt.rcParams['mathtext.fontset'] = 'dejavuserif'
 
 def plotHeatMap(title, matrix, galacticCoords, obj, outputFile = None, heatMapResolution = 8, colorBarSpan = 2000.0, showGrid = False, showColorBar = False, median = None, showMask = False):
+    """plotHeatMap.
+
+    Args:
+        title:
+        matrix:
+        galacticCoords:
+        obj:
+        outputFile:
+        heatMapResolution:
+        colorBarSpan:
+        showGrid:
+        showColorBar:
+        median:
+        showMask:
+    """
 
 #    if showMask:
 #        # optional test - if array element > threshold/2, set it to zero.
@@ -116,57 +131,32 @@ def plotHeatMap(title, matrix, galacticCoords, obj, outputFile = None, heatMapRe
     return
 
 
-def doPlot(options):
-
-    heatMapResolution = int(options.heatmapresolution)
-    if heatMapResolution not in [8, 16, 32, 64, 128, 256, 512]:
-        print("Heatmap resolution should be 8,  16, 32, 64, 128, 256 or 512")
-
-    #matrix = n.zeros((8,8), dtype=n.int)
-    matrix = n.zeros((heatMapResolution,heatMapResolution), dtype=n.int)
-    expmaps = {}
-
-    dataRows = readGenericDataFile(options.filename, delimiter='\t')
-    oldExpname = ''
-    numberOfRows = 0
-    #galacticCoords = None
-    obj = None
-
-    name = options.title
-
-    exps = set()
-    for row in dataRows:
-        x = int(float(row['x'])/10559.0 * heatMapResolution)
-        y = int((10559.0 - float(row['y']))/10559.0 * heatMapResolution)
-        exps.add(row['obs'])
-
-        if x >= 0 and y >= 0 and x < heatMapResolution and y < heatMapResolution:
-            matrix[y][x] += 1
-
-    medValue = n.median(matrix)
-
-    colorBarSpan = float(options.medianMultiplier) * medValue
-
-    if name is None:
-        name = os.path.basename(options.filename).split('.')[0] + ' (nobs = %d)' % len(exps)
-
-    plotHeatMap(name, matrix, None, None, outputFile = options.outputFile, heatMapResolution = heatMapResolution, colorBarSpan = colorBarSpan, median = medValue, showGrid = options.grid, showColorBar = options.colorbar, showMask = options.mask)
-
-
-    return 0
-
-
-
 
 def main():
+    """main.
+    """
     opts = docopt(__doc__, version='0.1')
     opts = cleanOptions(opts)
     options = Struct(**opts)
 
-    doPlot(options)
+    dataRows = readGenericDataFile(options.filename, delimiter='\t')
+
+    mat = calculateHeatMap(dataRows, resolution = int(options.heatmapresolution))
+
+    name = options.title
+    if name is None:
+        name = os.path.basename(options.filename).split('.')[0] + ' (nobs = %d)' % len(mat['exps'])
+
+    medValue = n.median(mat['matrix'])
+    colorBarSpan = float(options.medianMultiplier) * medValue
+
+    plotHeatMap(name, mat['matrix'], None, None, outputFile = options.outputFile, heatMapResolution = int(options.heatmapresolution) , colorBarSpan = colorBarSpan, median = medValue, showGrid = options.grid, showColorBar = options.colorbar, showMask = options.mask)
+
+
+
+
 
 
 if __name__=='__main__':
     main()
-
 
