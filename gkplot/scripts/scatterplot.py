@@ -2,7 +2,7 @@
 """Do a generic scatter plot.
 
 Usage:
-  %s <inputFile>... [--x=<x>] [--y=<y>] [--yerror=<yerror>] [--xlower=<xlower>] [--xupper=<xupper>] [--ylower=<ylower>] [--yupper=<yupper>] [--outputFile=<file>] [--threshold=<threshold>] [--log] [--xlabel=<xlabel>] [--ylabel=<ylabel>] [--xmajorticks=<xmajorticks>] [--xminorticks=<xminorticks>] [--ymajorticks=<ymajorticks>] [--yminorticks=<yminorticks>] [--plotlabel=<plotlabel>] [--plotlabelpos=<plotlabelpos>] [--panellabel=<panellabel>] [--panellabelpos=<panellabelpos>] [--alpha=<alpha>] [--pointsize=<pointsize>] [--mjdXaxis] [--addSecondaryTimeXAxis] [--grid] [--colour=<colour>] [--invert] [--tight] [--figsize=<figsize>] [--header=<header>] [--normalise] [--line] [--error] [--errorthick=<errorthick>] [--delimiter=<delimiter>]
+  %s <inputFile>... [--x=<x>] [--y=<y>] [--yerror=<yerror>] [--xlower=<xlower>] [--xupper=<xupper>] [--ylower=<ylower>] [--yupper=<yupper>] [--outputFile=<file>] [--threshold=<threshold>] [--log] [--xlabel=<xlabel>] [--ylabel=<ylabel>] [--xmajorticks=<xmajorticks>] [--xminorticks=<xminorticks>] [--ymajorticks=<ymajorticks>] [--yminorticks=<yminorticks>] [--plotlabel=<plotlabel>] [--plotlabelpos=<plotlabelpos>] [--panellabel=<panellabel>] [--panellabelpos=<panellabelpos>] [--alpha=<alpha>] [--pointsize=<pointsize>] [--mjdXaxis] [--addSecondaryTimeXAxis] [--grid] [--colour=<colour>] [--invert] [--tight] [--figsize=<figsize>] [--header=<header>] [--normalise] [--line] [--linewidth=<linewidth>] [--error] [--errorthick=<errorthick>] [--delimiter=<delimiter>] [--legend] [--legendlabels=<legendlabels>] [--equalaspect]
   %s (-h | --help)
   %s --version
 
@@ -36,14 +36,18 @@ Options:
   --header=<header>                 Assume no header file and collect it from the command line.
   --normalise                       Normalise the y axis.
   --line                            Line plot.
+  --linewidth=<linewidth>           Line width [default: 0.5].
   --error                           Scatter plot with errorbars (ignored if --line selected).
   --errorthick=<errorthick>         Thickness of the error line and cap. [default: 0.5]
   --grid                            Add a grid
+  --legend                          Add a legend
+  --legendlabels=<legendlabels>     Legend labels. Comma separated, no spaces.
   --log                             Plot log(y) instead of y.
   --invert                          invert y axis.
   --tight                           tight layout.
   --figsize=<figsize>               figure size, comma separated, no spaces [default: 6,3]
   --delimiter=<delimiter>           Delimiter to use [default: ,].
+  --equalaspect                     Set the aspect ratio to equal.
 
 E.g.:
    %s ~/atlas/dophot/ATLAS20ymv_dophot_o.txt ~/atlas/dophot/ATLAS20ymv_dophot_c.txt --x=mjd --y=mag --yerror=dminst --invert --xlower=59070 --xupper=59200 --ylower=15.5 --yupper=18.5 --tight --alpha=1 --pointsize=2 --xmajorticks=20 --xminorticks=2 --outputFile=/tmp/ATLAS20ymv_lc.png --error
@@ -74,11 +78,11 @@ MEDIUM_SIZE = 18
 BIGGER_SIZE = 25
 TINY_SIZE = 12
 plt.rc('font', size=SMALL_SIZE)                   # controls default text sizes
-plt.rc('axes', titlesize=MEDIUM_SIZE)            # fontsize of the axes title
-plt.rc('axes', labelsize=MEDIUM_SIZE)           # fontsize of the x and y labels
-plt.rc('xtick', labelsize=TINY_SIZE)            # fontsize of the tick labels
-plt.rc('ytick', labelsize=TINY_SIZE)            # fontsize of the tick labels
-plt.rc('legend', fontsize=SMALL_SIZE - 1)               # legend fontsize
+plt.rc('axes', titlesize=TINY_SIZE-8)            # fontsize of the axes title
+plt.rc('axes', labelsize=TINY_SIZE-8)           # fontsize of the x and y labels
+plt.rc('xtick', labelsize=TINY_SIZE-8)            # fontsize of the tick labels
+plt.rc('ytick', labelsize=TINY_SIZE-8)            # fontsize of the tick labels
+plt.rc('legend', fontsize=TINY_SIZE)               # legend fontsize
 plt.rc('figure', titlesize=BIGGER_SIZE)   # fontsize of the figure title
 plt.rcParams["font.family"] = "serif"
 plt.rcParams['mathtext.fontset'] = 'dejavuserif'
@@ -105,11 +109,12 @@ def plotScatter(data, options):
 
     fig = plt.figure(figsize=(float(figsize[0]), float(figsize[1])))
 
-    ax1 = fig.add_subplot(111)
+    #ax1 = fig.add_subplot(111)
 
 
     ax1 = fig.add_subplot(111)
     i = 0
+    legends = []
     for d in data:
         if len(colours) == 1:
             colour = colours[0]
@@ -131,10 +136,10 @@ def plotScatter(data, options):
             yarray = yarray/ymax
 
         if options.line:
-            ax1.plot(xarray, yarray, alpha = float(alpha), color=colour)
+            ax1.plot(xarray, yarray, alpha = float(alpha), color=colour, linewidth=float(options.linewidth))
         else:
             if options.error:
-                ax1.errorbar(xarray, yarray, fmt='o', yerr=yerrorarray, color=colour, markersize = float(options.pointsize), alpha = float(alpha), elinewidth=float(options.errorthick), capsize=(float(options.errorthick)*2), capthick=float(options.errorthick))
+                legends.append(ax1.errorbar(xarray, yarray, fmt='o', yerr=yerrorarray, color=colour, markersize = float(options.pointsize), alpha = float(alpha), elinewidth=float(options.errorthick), capsize=(float(options.errorthick)*2), capthick=float(options.errorthick)))
                 #ax1.errorbar(xarray, yarray, fmt='o', yerr=yerrorarray, color=colour, markersize = float(options.pointsize), fillstyle='full', alpha = float(alpha))
             else:
                 ax1.scatter(xarray, yarray, marker='o', alpha = float(alpha), color=colour, s = float(options.pointsize), edgecolors='none')
@@ -155,8 +160,10 @@ def plotScatter(data, options):
         tl.set_color('k')
 
     ax1.set_xlabel(options.xlabel)
-    #ax1.set_title('Classifier performance.')
+    #ax1.set_title('Simple plot of mag vs time for Makemake and Gault')
     #ax1.legend(loc=1)
+    if options.legend:
+        ax1.legend(legends, options.legendlabels.split(','), loc='upper right', scatterpoints = 1, prop = {'size':4})
     ax1.text(float(options.plotlabelpos), 0.95, options.plotlabel, transform=ax1.transAxes, va='top', size=MEDIUM_SIZE)
     ax1.text(float(options.panellabelpos), 0.95, options.panellabel, transform=ax1.transAxes, va='top', size=MEDIUM_SIZE, weight='bold')
 
@@ -173,6 +180,8 @@ def plotScatter(data, options):
     ax1.get_xaxis().set_tick_params(which='both', direction='out')
     ax1.set_xlim(float(options.xlower), float(options.xupper))
     ax1.set_ylim(float(options.ylower), float(options.yupper))
+    if options.equalaspect:
+        ax1.axes.set_aspect('equal')
 
     if options.log:
         ax1.set_yscale('log')
