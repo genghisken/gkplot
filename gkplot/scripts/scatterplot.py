@@ -2,7 +2,7 @@
 """Do a generic scatter plot.
 
 Usage:
-  %s <inputFile>... [--x=<x>] [--y=<y>] [--yerror=<yerror>] [--xlower=<xlower>] [--xupper=<xupper>] [--ylower=<ylower>] [--yupper=<yupper>] [--outputFile=<file>] [--threshold=<threshold>] [--log] [--xlabel=<xlabel>] [--ylabel=<ylabel>] [--xmajorticks=<xmajorticks>] [--xminorticks=<xminorticks>] [--ymajorticks=<ymajorticks>] [--yminorticks=<yminorticks>] [--plotlabel=<plotlabel>] [--plotlabelpos=<plotlabelpos>] [--panellabel=<panellabel>] [--panellabelpos=<panellabelpos>] [--alpha=<alpha>] [--pointsize=<pointsize>] [--mjdXaxis] [--addSecondaryTimeXAxis] [--grid] [--colour=<colour>] [--invert] [--tight] [--figsize=<figsize>] [--header=<header>] [--normalise] [--line] [--linewidth=<linewidth>] [--error] [--errorthick=<errorthick>] [--delimiter=<delimiter>] [--legend] [--legendlabels=<legendlabels>] [--equalaspect]
+  %s <inputFile>... [--x=<x>] [--y=<y>] [--yerror=<yerror>] [--xlower=<xlower>] [--xupper=<xupper>] [--ylower=<ylower>] [--yupper=<yupper>] [--outputFile=<file>] [--threshold=<threshold>] [--log] [--xlabel=<xlabel>] [--ylabel=<ylabel>] [--xmajorticks=<xmajorticks>] [--xminorticks=<xminorticks>] [--ymajorticks=<ymajorticks>] [--yminorticks=<yminorticks>] [--plotlabel=<plotlabel>] [--plotlabelpos=<plotlabelpos>] [--panellabel=<panellabel>] [--panellabelpos=<panellabelpos>] [--alpha=<alpha>] [--pointsize=<pointsize>] [--mjdXaxis] [--addSecondaryTimeXAxis] [--grid] [--colour=<colour>] [--invert] [--tight] [--figsize=<figsize>] [--header=<header>] [--normalise] [--line] [--linewidth=<linewidth>] [--error] [--errorthick=<errorthick>] [--delimiter=<delimiter>] [--legend] [--legendlabels=<legendlabels>] [--equalaspect] [--title=<title>]
   %s (-h | --help)
   %s --version
 
@@ -48,13 +48,15 @@ Options:
   --figsize=<figsize>               figure size, comma separated, no spaces [default: 6,3]
   --delimiter=<delimiter>           Delimiter to use [default: ,].
   --equalaspect                     Set the aspect ratio to equal.
+  --title=<title>                   Plot title.
 
 E.g.:
    %s ~/atlas/dophot/ATLAS20ymv_dophot_o.txt ~/atlas/dophot/ATLAS20ymv_dophot_c.txt --x=mjd --y=mag --yerror=dminst --invert --xlower=59070 --xupper=59200 --ylower=15.5 --yupper=18.5 --tight --alpha=1 --pointsize=2 --xmajorticks=20 --xminorticks=2 --outputFile=/tmp/ATLAS20ymv_lc.png --error
    %s ~/atlas/dophot/galactic_centre_vs_o.txt --x=mjd --y=mag --yerror=dminst --invert --xlower=57700 --xupper=59200 --ylower=12.5 --yupper=18.5 --tight --alpha=1 --pointsize=2 --xmajorticks=200 --xminorticks=20 --outputFile=/tmp/galactic_centre_lc.png --error
+   %s /tmp/tAT2023plg_20231105_Gr13_Free_slit1.0_1_f.asci --x='wavelength' --y='flux' --xlower=3500 --xupper=9500 --ylower=-0.3 --yupper=1.1 --outputFile=/tmp/AT2023plg.jpeg --xlabel=wavelength --ylabel='normalised flux' --xmajorticks=500 --xminorticks=100 --ymajorticks=0.1 --yminorticks=0.01 --header='wavelength flux' --normalise --line --linewidth=0.25 --colour=black --alpha=1.0 --delimiter=' ' --title=AT2023plg
 """
 import sys
-__doc__ = __doc__ % (sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0])
+__doc__ = __doc__ % (sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0])
 from docopt import docopt
 import os, shutil, re, csv, subprocess
 from gkutils.commonutils import Struct, cleanOptions, readGenericDataFile
@@ -160,8 +162,9 @@ def plotScatter(data, options):
         tl.set_color('k')
 
     ax1.set_xlabel(options.xlabel)
-    #ax1.set_title('Simple plot of mag vs time for Makemake and Gault')
-    #ax1.legend(loc=1)
+    if options.title:
+        ax1.set_title(options.title)
+
     if options.legend:
         ax1.legend(legends, options.legendlabels.split(','), loc='upper right', scatterpoints = 1, prop = {'size':4})
     ax1.text(float(options.plotlabelpos), 0.95, options.plotlabel, transform=ax1.transAxes, va='top', size=MEDIUM_SIZE)
@@ -210,7 +213,7 @@ def doPlots(options):
     allData = []
     fieldnames = None
     if options.header:
-        fieldnames = options.header.split()
+        fieldnames = options.header.split(options.delimiter)
     for datafile in options.inputFile:
         data = {}
         dataRows = readGenericDataFile(datafile, delimiter=options.delimiter, fieldnames=fieldnames)
