@@ -2,7 +2,7 @@
 """Plot histogram to show performance of the specified trained classifier.
 
 Usage:
-  %s <inputFile>... [--delimiter=<delimiter>] [--column=<column>] [--outputFile=<file>] [--binwidth=<binwidth>] [--threshold=<threshold>] [--log] [--xlabel=<xlabel>] [--ylabel=<ylabel>] [--binlower=<binlower>] [--binupper=<binupper>] [--majorticks=<majorticks>] [--minorticks=<minorticks>] [--plotlabel=<plotlabel>] [--panellabel=<panellabel>] [--ylimit=<ylimit>] [--alpha=<alpha>] [--colour=<colour>] [--leglabels=<leglabels>]
+  %s <inputFile>... [--delimiter=<delimiter>] [--column=<column>] [--outputFile=<file>] [--binwidth=<binwidth>] [--threshold=<threshold>] [--log] [--xlabel=<xlabel>] [--ylabel=<ylabel>] [--binlower=<binlower>] [--binupper=<binupper>] [--majorticks=<majorticks>] [--minorticks=<minorticks>] [--plotlabel=<plotlabel>] [--panellabel=<panellabel>] [--ylimit=<ylimit>] [--alpha=<alpha>] [--colour=<colour>] [--leglabels=<leglabels>] [--normalise]
   %s (-h | --help)
   %s --version
 
@@ -27,6 +27,7 @@ Options:
   --alpha=<alpha>              transparency setting - comma separated no spaces if more than one alpha [default: 0.5]
   --log                        Plot log(y) instead of y.
   --leglabels=<leglabels>      Legend labels (alternative to using the columns).
+  --normalise                  Normalise the histogram.
 
   e.g.:
 
@@ -124,7 +125,7 @@ def plotHistogram(data, options):
     plt.tight_layout()
 
     if options.outputFile is not None:
-        plt.savefig(options.outputFile)
+        plt.savefig(options.outputFile, dpi=600)
     else:
         plt.show()
 
@@ -143,8 +144,8 @@ def doPlots(options):
                 datum = float(row[columns[i]])
             else:
                 datum = float(row[options.column])
-            if datum > 0:
-                data.append(datum)
+            #if datum > 0:
+            data.append(datum)
         allData.append(data)
         i += 1
 
