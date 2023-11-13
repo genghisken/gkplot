@@ -2,7 +2,7 @@
 """Plot sky positions onto an Aitoff map of the sky.
 
 Usage:
-  %s <filename>... [--racol=<racol>] [--deccol=<deccol>] [--mjdcol=<mjdcol>] [--filtercol=<filtercol>] [--expnamecol=<expnamecol>] [--commentcol=<commentcol>] [--usepatches] [--alpha=<alpha>] [--outfile=<outfile>] [--tight] [--delimiter=<delimiter>] [--pointsize=<pointsize>]
+  %s <filename>... [--racol=<racol>] [--deccol=<deccol>] [--mjdcol=<mjdcol>] [--filtercol=<filtercol>] [--expnamecol=<expnamecol>] [--commentcol=<commentcol>] [--usepatches] [--alpha=<alpha>] [--outfile=<outfile>] [--tight] [--delimiter=<delimiter>] [--pointsize=<pointsize>] [--title=<title>]
   %s (-h | --help)
   %s --version
 
@@ -19,8 +19,9 @@ Options:
   --outfile=<outfile>          Output file.
   --alpha=<alpha>              Transparency. [default: 0.1]
   --tight                      Tight layout.
-  --delimiter=<delimiter>      Delimiter to use [default: \t]
+  --delimiter=<delimiter>      Delimiter to use [default:  ]
   --pointsize=<pointsize>      Point size [default: 0.1]
+  --title=<title>              Title for the plot.
 
 E.g.:
   %s ~/atlas/dophot/small_area_fields_subset.txt --alpha=0.1 --usepatches --outfile=/tmp/test.png
@@ -174,17 +175,23 @@ def doPlot(options, objects, plotNumber = 111, alpha = 0.2, minMJD = 0.0, maxMJD
     if usePatches:
         # Square exposures for ATLAS, circular ones for PS1
         for x,y in zip(gx,gy):
-            ax1.add_patch(patches.Circle((x, y), r, color=colors[0], alpha = float(options.alpha)))
+            #ax1.add_patch(patches.Circle((x, y), r, color=colors[0], alpha = float(options.alpha)))
+            ax1.add_patch(patches.Rectangle((x-s/2.0, y-s/2.0), s/math.cos(y), s, color=colors[0], alpha = float(options.alpha)))
         for x,y in zip(rx,ry):
-            ax1.add_patch(patches.Circle((x, y), r, color=colors[1], alpha = float(options.alpha)))
+            #ax1.add_patch(patches.Circle((x, y), r, color=colors[1], alpha = float(options.alpha)))
+            ax1.add_patch(patches.Rectangle((x-s/2.0, y-s/2.0), s/math.cos(y), s, color=colors[1], alpha = float(options.alpha)))
         for x,y in zip(ix,iy):
-            ax1.add_patch(patches.Circle((x, y), r, color=colors[2], alpha = float(options.alpha)))
+            #ax1.add_patch(patches.Circle((x, y), r, color=colors[2], alpha = float(options.alpha)))
+            ax1.add_patch(patches.Rectangle((x-s/2.0, y-s/2.0), s/math.cos(y), s, color=colors[2], alpha = float(options.alpha)))
         for x,y in zip(zx,zy):
-            ax1.add_patch(patches.Circle((x, y), r, color=colors[3], alpha = float(options.alpha)))
+            #ax1.add_patch(patches.Circle((x, y), r, color=colors[3], alpha = float(options.alpha)))
+            ax1.add_patch(patches.Rectangle((x-s/2.0, y-s/2.0), s/math.cos(y), s, color=colors[3], alpha = float(options.alpha)))
         for x,y in zip(yx,yy):
-            ax1.add_patch(patches.Circle((x, y), r, color=colors[4], alpha = float(options.alpha)))
+            #ax1.add_patch(patches.Circle((x, y), r, color=colors[4], alpha = float(options.alpha)))
+            ax1.add_patch(patches.Rectangle((x-s/2.0, y-s/2.0), s/math.cos(y), s, color=colors[4], alpha = float(options.alpha)))
         for x,y in zip(wx,wy):
-            ax1.add_patch(patches.Circle((x, y), r, color=colors[5], alpha = float(options.alpha)))
+            #ax1.add_patch(patches.Circle((x, y), r, color=colors[5], alpha = float(options.alpha)))
+            ax1.add_patch(patches.Rectangle((x-s/2.0, y-s/2.0), s/math.cos(y), s, color=colors[5], alpha = float(options.alpha)))
         for x,y in zip(cx,cy):
             ax1.add_patch(patches.Rectangle((x-s/2.0, y-s/2.0), s/math.cos(y), s, color=colors[6], alpha = float(options.alpha)))
         for x,y in zip(ox,oy):
@@ -213,6 +220,7 @@ def doPlot(options, objects, plotNumber = 111, alpha = 0.2, minMJD = 0.0, maxMJD
     #leg = ax1.legend([gleg, rleg, ileg, zleg, yleg], ['g', 'r', 'i', 'z', 'y'], loc='upper right', scatterpoints = 1, prop = {'size':6})
     #leg = ax1.legend([gleg, rleg, ileg, zleg, yleg, wleg], ['g', 'r', 'i', 'z', 'y', 'w'], loc='upper right', scatterpoints = 1, prop = {'size':4})
     #leg = ax1.legend([gleg, rleg, ileg, zleg, yleg, wleg, cleg, oleg], ['g', 'r', 'i', 'z', 'y', 'w', 'c', 'o'], loc='upper right', scatterpoints = 1, prop = {'size':4})
+    leg = ax1.legend([wleg, yleg, cleg, gleg], ['MLO', 'HKO', 'STH', 'CHL'], loc='upper right', scatterpoints = 1, prop = {'size':4})
 
     #leg = ax1.legend([cleg, oleg], ['c', 'o'], loc='upper right', scatterpoints = 1, prop = {'size':4})
 
@@ -287,7 +295,9 @@ def doPlot(options, objects, plotNumber = 111, alpha = 0.2, minMJD = 0.0, maxMJD
     #for i in range(0,6):
     #    ax1.text(xrad[i], yrad[i], lab[i])
 
-    #pl.title("%s" % getDateFromMJD(maxMJD).split(' ')[0], color='b', fontsize=12)
+    if options.title:
+        #pl.title("%s" % options.title, color='b', fontsize=12)
+        pl.title("%s" % getDateFromMJD(float(options.title)).split(' ')[0], color='b', fontsize=12)
     pl.grid(True)
     return pl
 
@@ -395,6 +405,8 @@ def main(argv = None):
 #    plotHammerProjection(options, filename, objectsList, alpha=0.02, usePatches = True, minMJD = sep01, maxMJD = oct01)
     #alpha = 0.002
 
+    print(options)
+    print("Delimiter = ", options.delimiter)
     for filename in options.filename:
         objectsList = readGenericDataFile(filename, delimiter=options.delimiter)
         plotHammerProjection(options, filename, objectsList, alpha=float(options.alpha), usePatches = options.usepatches)
