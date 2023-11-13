@@ -2,7 +2,7 @@
 """Plot an ATLAS detector heatmap from an input file - or import the plotHeatMap function. Input file needs headed rows called x and y.
 
 Usage:
-  %s <filename> [--outputFile=<file>] [--title=<title>] [--heatmapresolution=<heatmapresolution>] [--delimiter=<delimiter>] [--medianMultiplier=<medianMultiplier>] [--grid] [--colorbar] [--mask] [--horizontal]
+  %s <filename> [--outputFile=<file>] [--title=<title>] [--heatmapresolution=<heatmapresolution>] [--delimiter=<delimiter>] [--multiplier=<multiplier>] [--grid] [--colorbar] [--mask] [--horizontal] [--matrixfile]
   %s (-h | --help)
   %s --version
 
@@ -13,17 +13,19 @@ Options:
   --title=<title>                           Plot title.
   --heatmapresolution=<heatmapresolution>   Heatmap resolution as a power of 2 between 8 and 512 [default: 128].
   --delimiter=<delimiter>                   Delimiter to use [default: \\t].
-  --medianMultiplier=<medianMultiplier>     Multiplier for the Median for the colorbar and cuts [default: 1.5].
+  --multiplier=<multiplier>                 Multiplier for the Median for the colorbar and cuts [default: 1.6].
   --grid                                    Display a grid.
   --colorbar                                Display a colour bar.
   --horizontal                              Show the colour bar horizontally (ignored if colourbar not displayed).
   --mask                                    Set the display above the threshold value to be zero.
+  --matrixfile                              Assume the input file is a pre-caculated matrix. In this case the heatmapresolution option will be ignored.
 """
 import sys
 __doc__ = __doc__ % (sys.argv[0], sys.argv[0], sys.argv[0])
 from docopt import docopt
 import os, MySQLdb, shutil, re, csv, subprocess
 from gkutils.commonutils import Struct, cleanOptions, readGenericDataFile, transform, J2000toGalactic, calculateHeatMap
+from math import sqrt
 import numpy as n
 import matplotlib.pyplot as plt
 import matplotlib.ticker as plticker
@@ -31,6 +33,8 @@ import matplotlib.colors as colors
 import datetime
 import os
 import matplotlib.patheffects as path_effects
+import copy
+from astropy.stats import median_absolute_deviation
 
 SMALL_SIZE = 14
 MEDIUM_SIZE = 18
@@ -113,6 +117,7 @@ def plotHeatMap(title, matrix, galacticCoords, obj, outputFile = None, heatMapRe
 
     # This doesn't work yet!
     if showMask:
+        #cmap = copy.copy(plt.cm.get_cmap("viridis"))
         my_cmap = plt.cm.get_cmap("viridis")
         my_cmap.set_over('black')
 
@@ -140,17 +145,39 @@ def main():
     options = Struct(**opts)
 
     dataRows = readGenericDataFile(options.filename, delimiter='\t')
+    mat = {}
+    if options.matrixfile:
+        resolution = int(sqrt(len(dataRows)))
+        if resolution not in [8, 16, 32, 64, 128, 256, 512]:
+            print ("Invalid map resolution of %d" % (resolution))
+        mat['matrix'] = n.array([int(x['ndet']) for x in dataRows]).reshape(resolution, resolution)
+    else:
+        mat = calculateHeatMap(dataRows, resolution = int(options.heatmapresolution))
 
-    mat = calculateHeatMap(dataRows, resolution = int(options.heatmapresolution))
+    matrix = mat['matrix']
+
+    # Flip the matrix up/down, because we are in pixel space now and y zero is top left.
+    matrixFlipped = n.flip(matrix, 0)
+
+    median = n.median(matrix)
+    #median = median_absolute_deviation(matrix)
+    stddev = n.std(matrix)
+    mad = median_absolute_deviation(matrix)
+    colorBarSpan = float(options.multiplier) * median
+    count = n.count_nonzero(matrix > colorBarSpan)
+    proportionPercentage = count/(matrix.shape[0]*matrix.shape[1]) * 100.0
+
+    print (mad, median, stddev, median / stddev, colorBarSpan, float(options.multiplier) * stddev)
+
+    print ("Mask percentage = %.2f%%" % (proportionPercentage))
 
     name = options.title
-    if name is None:
+    if name is None and not options.matrixfile:
         name = os.path.basename(options.filename).split('.')[0] + ' (nobs = %d)' % len(mat['exps'])
+    elif name is None and options.matrixfile and options.mask:
+        name = "Mask = %.2f%%" % (proportionPercentage)
 
-    medValue = n.median(mat['matrix'])
-    colorBarSpan = float(options.medianMultiplier) * medValue
-
-    plotHeatMap(name, mat['matrix'], None, None, outputFile = options.outputFile, heatMapResolution = int(options.heatmapresolution) , colorBarSpan = colorBarSpan, median = medValue, showGrid = options.grid, showColorBar = options.colorbar, showMask = options.mask)
+    plotHeatMap(name, matrixFlipped, None, None, outputFile = options.outputFile, heatMapResolution = int(options.heatmapresolution) , colorBarSpan = colorBarSpan, median = median, showGrid = options.grid, showColorBar = options.colorbar, showMask = options.mask)
 
 
 
