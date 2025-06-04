@@ -12,10 +12,10 @@ Options:
   --x=<x>                           Column to plot [default: MJD-OBS]
   --y=<y>                           Column to plot [default: SEEING]
   --yerror=<yerror>                 yerror to plot (ignored if --error flag is not set) [default: error]
-  --xlower=<xlower>                 xlower limit [default: 57300]
-  --xupper=<xupper>                 xupper limit of the bin [default: 58950]
-  --ylower=<ylower>                 ylower limit [default: 2]
-  --yupper=<yupper>                 yupper limit of the bin [default: 10]
+  --xlower=<xlower>                 xlower limit
+  --xupper=<xupper>                 xupper limit
+  --ylower=<ylower>                 ylower limit
+  --yupper=<yupper>                 yupper limit
   --outputFile=<file>               Output file. If not defined, show plot.
   --threshold=<threshold>           Plots a vertical dotted line.
   --xlabel=<xlabel>                 x label [default: ]
@@ -24,10 +24,10 @@ Options:
   --plotlabelpos=<plotlabelpos>     Plot label position [default: 0.8]
   --panellabel=<panellabel>         Panel label (e.g. 'a)' ) [default: ]
   --panellabelpos=<panellabelpos>   Panel label position [default: 0.1]
-  --xmajorticks=<xmajorticks>       x major ticks [default: 200.0]
-  --xminorticks=<xminorticks>       x minor ticks [default: 20.0]
-  --ymajorticks=<ymajorticks>       y major ticks [default: 1.0]
-  --yminorticks=<yminorticks>       y minor ticks [default: 0.2]
+  --xmajorticks=<xmajorticks>       x major ticks
+  --xminorticks=<xminorticks>       x minor ticks
+  --ymajorticks=<ymajorticks>       y major ticks
+  --yminorticks=<yminorticks>       y minor ticks
   --colour=<colour>                 Specify colour or more than one colour separated commas with no spaces. [default: orange,cyan]
   --alpha=<alpha>                   transparency setting - comma separated no spaces if more than one alpha [default: 0.5]
   --pointsize=<pointsize>           point size [default: 0.5]
@@ -54,16 +54,19 @@ E.g.:
    %s ~/atlas/dophot/ATLAS20ymv_dophot_o.txt ~/atlas/dophot/ATLAS20ymv_dophot_c.txt --x=mjd --y=mag --yerror=dminst --invert --xlower=59070 --xupper=59200 --ylower=15.5 --yupper=18.5 --tight --alpha=1 --pointsize=2 --xmajorticks=20 --xminorticks=2 --outputFile=/tmp/ATLAS20ymv_lc.png --error
    %s ~/atlas/dophot/galactic_centre_vs_o.txt --x=mjd --y=mag --yerror=dminst --invert --xlower=57700 --xupper=59200 --ylower=12.5 --yupper=18.5 --tight --alpha=1 --pointsize=2 --xmajorticks=200 --xminorticks=20 --outputFile=/tmp/galactic_centre_lc.png --error
    %s /tmp/tAT2023plg_20231105_Gr13_Free_slit1.0_1_f.asci --x='wavelength' --y='flux' --xlower=3500 --xupper=9500 --ylower=-0.3 --yupper=1.1 --outputFile=/tmp/AT2023plg.jpeg --xlabel=wavelength --ylabel='normalised flux' --xmajorticks=500 --xminorticks=100 --ymajorticks=0.1 --yminorticks=0.01 --header='wavelength flux' --normalise --line --linewidth=0.25 --colour=black --alpha=1.0 --delimiter=' ' --title=AT2023plg
+   %s ~/atlas/dophot/232.6801_21.1287_o.dph ~/atlas/dophot/232.6801_21.1287_c.dph ~/atlas/dophot/Q2326801+211287_o.lc ~/atlas/dophot/Q2326801+211287_c.lc --x=mjd --y=m --yerror=dminst --invert --xlower=57070 --xupper=60750 --ylower=14 --yupper=20.5 --tight --alpha=1 --xmajorticks=200 --xminorticks=20 --error --delimiter=' ' --outputFile=/tmp/232.6801_21.1287.dph.png --colour=orange,cyan,red,blue
 """
 import sys
-__doc__ = __doc__ % (sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0])
+__doc__ = __doc__ % (sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0])
 from docopt import docopt
 import os, shutil, re, csv, subprocess
 from gkutils.commonutils import Struct, cleanOptions, readGenericDataFile
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
-from matplotlib.dates import epoch2num
+from matplotlib.ticker import AutoMinorLocator
+#from matplotlib.dates import epoch2num
 import matplotlib.dates as mdates
+
 
 years = mdates.YearLocator()   # every year
 months = mdates.MonthLocator()  # every month
@@ -170,19 +173,32 @@ def plotScatter(data, options):
     ax1.text(float(options.plotlabelpos), 0.95, options.plotlabel, transform=ax1.transAxes, va='top', size=MEDIUM_SIZE)
     ax1.text(float(options.panellabelpos), 0.95, options.panellabel, transform=ax1.transAxes, va='top', size=MEDIUM_SIZE, weight='bold')
 
-    ml = MultipleLocator(float(options.xmajorticks))
-    ax1.xaxis.set_major_locator(ml)
-    ml = MultipleLocator(float(options.xminorticks))
-    ax1.xaxis.set_minor_locator(ml)
+    if options.xmajorticks and options.xminorticks:
+        ml = MultipleLocator(float(options.xmajorticks))
+        ax1.xaxis.set_major_locator(ml)
+        ml = MultipleLocator(float(options.xminorticks))
+        ax1.xaxis.set_minor_locator(ml)
+    else:
+        ml = AutoMinorLocator(10)
+        ax1.xaxis.set_minor_locator(ml)
 
-    ml = MultipleLocator(float(options.ymajorticks))
-    ax1.yaxis.set_major_locator(ml)
-    ml = MultipleLocator(float(options.yminorticks))
-    ax1.yaxis.set_minor_locator(ml)
+    if options.ymajorticks and options.yminorticks:
+        ml = MultipleLocator(float(options.ymajorticks))
+        ax1.yaxis.set_major_locator(ml)
+        ml = MultipleLocator(float(options.yminorticks))
+        ax1.yaxis.set_minor_locator(ml)
+    else:
+        ml = AutoMinorLocator(10)
+        ax1.yaxis.set_minor_locator(ml)
 
     ax1.get_xaxis().set_tick_params(which='both', direction='out')
-    ax1.set_xlim(float(options.xlower), float(options.xupper))
-    ax1.set_ylim(float(options.ylower), float(options.yupper))
+
+    if options.xlower and options.xupper:
+        ax1.set_xlim(float(options.xlower), float(options.xupper))
+
+    if options.ylower and options.yupper:
+        ax1.set_ylim(float(options.ylower), float(options.yupper))
+
     if options.equalaspect:
         ax1.axes.set_aspect('equal')
 

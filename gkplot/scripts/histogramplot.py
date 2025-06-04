@@ -32,10 +32,11 @@ Options:
   e.g.:
 
   %s ~/Documents/atlas/transient_paper/ztf_supernovae_2019.tsv ~/Documents/atlas/transient_paper/atlas_supernovae_2019.tsv ~/Documents/atlas/transient_paper/asassn_supernovae_2019.tsv --delimiter=$'\\t' --column=z --xlabel="redshift (z)" --ylabel=Number --binwidth=0.01 --binlower=0.0 --binupper=0.4 --majorticks=0.1 --minorticks=0.01 --colour=orange,red,blue --alpha=0.3,0.4,0.6 --outputFile=/tmp/zcomparison_2019.pdf --leglabels=ZTF,ATLAS,ASAS-SN
+  %s ~/atlas/tns/HKO-orange.csv --column=mag --xlabel="Discovery mag" --ylabel=Number --binwidth=0.25 --binlower=12 --binupper=21 --majorticks=1 --minorticks=0.25 --colour=orange --alpha=0.3 --leglabels="HKO orange"
   
 """
 import sys
-__doc__ = __doc__ % (sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0])
+__doc__ = __doc__ % (sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0])
 from docopt import docopt
 import os, shutil, re, csv, subprocess
 from gkutils.commonutils import Struct, cleanOptions, readGenericDataFile
@@ -76,8 +77,8 @@ def plotHistogram(data, options):
     ml = MultipleLocator(float(options.majorticks))
     ax1.xaxis.set_major_locator(ml)
 
-    ax1 = fig.add_subplot(111)
     # May have more than one histogram to plot
+
     i = 0
     for d in data:
         if len(colours) == 1:
