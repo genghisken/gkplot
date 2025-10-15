@@ -52,12 +52,17 @@ Options:
 
 E.g.:
    %s ~/atlas/dophot/ATLAS20ymv_dophot_o.txt ~/atlas/dophot/ATLAS20ymv_dophot_c.txt --x=mjd --y=mag --yerror=dminst --invert --xlower=59070 --xupper=59200 --ylower=15.5 --yupper=18.5 --tight --alpha=1 --pointsize=2 --xmajorticks=20 --xminorticks=2 --outputFile=/tmp/ATLAS20ymv_lc.png --error
+
    %s ~/atlas/dophot/galactic_centre_vs_o.txt --x=mjd --y=mag --yerror=dminst --invert --xlower=57700 --xupper=59200 --ylower=12.5 --yupper=18.5 --tight --alpha=1 --pointsize=2 --xmajorticks=200 --xminorticks=20 --outputFile=/tmp/galactic_centre_lc.png --error
+
    %s /tmp/tAT2023plg_20231105_Gr13_Free_slit1.0_1_f.asci --x='wavelength' --y='flux' --xlower=3500 --xupper=9500 --ylower=-0.3 --yupper=1.1 --outputFile=/tmp/AT2023plg.jpeg --xlabel=wavelength --ylabel='normalised flux' --xmajorticks=500 --xminorticks=100 --ymajorticks=0.1 --yminorticks=0.01 --header='wavelength flux' --normalise --line --linewidth=0.25 --colour=black --alpha=1.0 --delimiter=' ' --title=AT2023plg
+
    %s ~/atlas/dophot/232.6801_21.1287_o.dph ~/atlas/dophot/232.6801_21.1287_c.dph ~/atlas/dophot/Q2326801+211287_o.lc ~/atlas/dophot/Q2326801+211287_c.lc --x=mjd --y=m --yerror=dminst --invert --xlower=57070 --xupper=60750 --ylower=14 --yupper=20.5 --tight --alpha=1 --xmajorticks=200 --xminorticks=20 --error --delimiter=' ' --outputFile=/tmp/232.6801_21.1287.dph.png --colour=orange,cyan,red,blue
+
+   %s /Users/kws/soxs-workspace-20250604/reduced/2025-06-04/soxs-stare/20250605T075734_VIS_1X1_1_STARE_SLIT1.0_1800.0S_SOXS_SN2025ML_EXTRACTED_MERGED.txt /Users/kws/soxs-workspace-20250604/reduced/2025-06-04/soxs-stare/20250605T083853_VIS_1X1_1_STARE_SLIT1.0_2400.0S_SOXS_SN2025ML_EXTRACTED_MERGED.txt /Users/kws/soxs-workspace-20250604/reduced/2025-06-04/soxs-stare/20250605T092314_VIS_1X1_1_STARE_SLIT5.0_2400.0S_SOXS_SN2025ML_EXTRACTED_MERGED.txt --x=WAVE --y=FLUX_COUNTS --line --linewidth=0.1 --colour=black,red,blue --alpha=1.0,1.0,1.0 --xlabel='wavelength (nm)' --ylabel=flux --delimiter=' ' --title=SN2025mlo --legend --legendlabels='1800s slit=1.0','2400s slit=1.0','2400s slit=5.0'
 """
 import sys
-__doc__ = __doc__ % (sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0])
+__doc__ = __doc__ % (sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0])
 from docopt import docopt
 import os, shutil, re, csv, subprocess
 from gkutils.commonutils import Struct, cleanOptions, readGenericDataFile
@@ -83,10 +88,10 @@ MEDIUM_SIZE = 18
 BIGGER_SIZE = 25
 TINY_SIZE = 12
 plt.rc('font', size=SMALL_SIZE)                   # controls default text sizes
-plt.rc('axes', titlesize=TINY_SIZE-8)            # fontsize of the axes title
-plt.rc('axes', labelsize=TINY_SIZE-8)           # fontsize of the x and y labels
-plt.rc('xtick', labelsize=TINY_SIZE-8)            # fontsize of the tick labels
-plt.rc('ytick', labelsize=TINY_SIZE-8)            # fontsize of the tick labels
+plt.rc('axes', titlesize=TINY_SIZE)            # fontsize of the axes title
+plt.rc('axes', labelsize=TINY_SIZE)           # fontsize of the x and y labels
+plt.rc('xtick', labelsize=TINY_SIZE)            # fontsize of the tick labels
+plt.rc('ytick', labelsize=TINY_SIZE)            # fontsize of the tick labels
 plt.rc('legend', fontsize=TINY_SIZE)               # legend fontsize
 plt.rc('figure', titlesize=BIGGER_SIZE)   # fontsize of the figure title
 plt.rcParams["font.family"] = "serif"
@@ -114,8 +119,10 @@ def plotScatter(data, options):
 
     fig = plt.figure(figsize=(float(figsize[0]), float(figsize[1])))
 
-    #ax1 = fig.add_subplot(111)
+    if options.legend:
+        plotlabels = options.legendlabels.split(',')
 
+    #ax1 = fig.add_subplot(111)
 
     ax1 = fig.add_subplot(111)
     i = 0
@@ -141,7 +148,10 @@ def plotScatter(data, options):
             yarray = yarray/ymax
 
         if options.line:
-            ax1.plot(xarray, yarray, alpha = float(alpha), color=colour, linewidth=float(options.linewidth))
+            label=None
+            if options.legend:
+                label = plotlabels[i]
+            ax1.plot(xarray, yarray, alpha = float(alpha), color=colour, linewidth=float(options.linewidth), label = label)
         else:
             if options.error:
                 legends.append(ax1.errorbar(xarray, yarray, fmt='o', yerr=yerrorarray, color=colour, markersize = float(options.pointsize), alpha = float(alpha), elinewidth=float(options.errorthick), capsize=(float(options.errorthick)*2), capthick=float(options.errorthick)))
@@ -158,6 +168,7 @@ def plotScatter(data, options):
             ax2.xaxis.set_minor_locator(months)
             ax2.set_xlabel('Date')
             #ax2.xaxis.set_minor_formatter(monthsFmt)
+
         i += 1
 
     ax1.set_ylabel(options.ylabel)
@@ -168,8 +179,6 @@ def plotScatter(data, options):
     if options.title:
         ax1.set_title(options.title)
 
-    if options.legend:
-        ax1.legend(legends, options.legendlabels.split(','), loc='upper right', scatterpoints = 1, prop = {'size':4})
     ax1.text(float(options.plotlabelpos), 0.95, options.plotlabel, transform=ax1.transAxes, va='top', size=MEDIUM_SIZE)
     ax1.text(float(options.panellabelpos), 0.95, options.panellabel, transform=ax1.transAxes, va='top', size=MEDIUM_SIZE, weight='bold')
 
@@ -210,6 +219,16 @@ def plotScatter(data, options):
 
     if options.threshold is not None:
         ax1.axvline(x=float(options.threshold),color='k',linestyle='--')
+
+#    if options.legend:
+#        ax1.legend(legends, options.legendlabels.split(','), loc='upper right', scatterpoints = 1, prop = {'size':4})
+
+    if options.legend:
+        leg = ax1.legend(loc='upper right', scatterpoints = 1)
+        # Thicken the lines in the legend
+        for legend_line in leg.legend_handles:
+            legend_line.set_linewidth(1)
+
 
     if options.grid:
         plt.grid(which='major', linestyle=':')
