@@ -2,7 +2,7 @@
 """Plot sky positions onto an Aitoff map of the sky.
 
 Usage:
-  %s <filename>... [--racol=<racol>] [--deccol=<deccol>] [--mjdcol=<mjdcol>] [--filtercol=<filtercol>] [--expnamecol=<expnamecol>] [--commentcol=<commentcol>] [--usepatches] [--alpha=<alpha>] [--outfile=<outfile>] [--tight] [--delimiter=<delimiter>] [--pointsize=<pointsize>] [--title=<title>]
+  %s <filename>... [--racol=<racol>] [--deccol=<deccol>] [--mjdcol=<mjdcol>] [--filtercol=<filtercol>] [--expnamecol=<expnamecol>] [--commentcol=<commentcol>] [--usepatches] [--alpha=<alpha>] [--outfile=<outfile>] [--tight] [--delimiter=<delimiter>] [--pointsize=<pointsize>] [--title=<title>] [--rectangular] [--fpshape=<fpshape>]
   %s (-h | --help)
   %s --version
 
@@ -16,12 +16,14 @@ Options:
   --expnamecol=<expnamecol>    Column that represents exposure name.
   --commentcol=<commentcol>    Column that represents a comment (e.g. a survey comment, for Pan-STARRS).
   --usepatches                 Plot patches (defined shapes), not points, e.g. ATLAS square footprints or Pan-STARRS circles mapped onto the sky.
+  --rectangular                Use a rectangular footprint (equatorial mount, which is always oriented north-up). Otherwise assume circular.
   --outfile=<outfile>          Output file.
   --alpha=<alpha>              Transparency. [default: 0.1]
   --tight                      Tight layout.
   --delimiter=<delimiter>      Delimiter to use [default:  ]
   --pointsize=<pointsize>      Point size [default: 0.1]
   --title=<title>              Title for the plot.
+  --fpshape=<fpshape>          Footprint shape. Use first value as radius. If two values supplied use one as x and the other as y. Comma separated, no spaces [default: 1.784]
 
 E.g.:
   %s ~/atlas/dophot/small_area_fields_subset.txt --alpha=0.1 --usepatches --outfile=/tmp/test.png
@@ -114,15 +116,19 @@ def doPlot(options, objects, plotNumber = 111, alpha = 0.2, minMJD = 0.0, maxMJD
         #if mjd > 57174: # June 1st
         if mjd is not None and mjd > minMJD and mjd < maxMJD:
             if row[options.filtercol][0] == 'g':
+                print('g')
                 gx.append(ra)
                 gy.append(dec)
             elif row[options.filtercol][0] == 'r':
+                print('r')
                 rx.append(ra)
                 ry.append(dec)
             elif row[options.filtercol][0] == 'i':
+                print('i')
                 ix.append(ra)
                 iy.append(dec)
             elif row[options.filtercol][0] == 'z':
+                print('z')
                 zx.append(ra)
                 zy.append(dec)
             elif row[options.filtercol][0] == 'y':
@@ -170,32 +176,55 @@ def doPlot(options, objects, plotNumber = 111, alpha = 0.2, minMJD = 0.0, maxMJD
     ax1 = fig2.add_subplot(plotNumber, projection="hammer")
 
     s = 5.4 * degtorad
-    r = 1.4 * degtorad
+    if ',' in options.fpshape:
+        s = float(options.fpshape.split(',')[0])
+    else:
+        s = float(options.fpshape.split(',')[0])
+
+    r = float(options.fpshape.split(',')[0]) * degtorad
 
     if usePatches:
         # Square exposures for ATLAS, circular ones for PS1
         for x,y in zip(gx,gy):
-            #ax1.add_patch(patches.Circle((x, y), r, color=colors[0], alpha = float(options.alpha)))
-            ax1.add_patch(patches.Rectangle((x-s/2.0, y-s/2.0), s/math.cos(y), s, color=colors[0], alpha = float(options.alpha)))
+            if options.rectangular:
+                ax1.add_patch(patches.Rectangle((x-s/2.0, y-s/2.0), s/math.cos(y), s, color=colors[0], alpha = float(options.alpha)))
+            else:
+                ax1.add_patch(patches.Circle((x, y), r, color=colors[0], alpha = float(options.alpha)))
         for x,y in zip(rx,ry):
-            #ax1.add_patch(patches.Circle((x, y), r, color=colors[1], alpha = float(options.alpha)))
-            ax1.add_patch(patches.Rectangle((x-s/2.0, y-s/2.0), s/math.cos(y), s, color=colors[1], alpha = float(options.alpha)))
+            if options.rectangular:
+                ax1.add_patch(patches.Rectangle((x-s/2.0, y-s/2.0), s/math.cos(y), s, color=colors[1], alpha = float(options.alpha)))
+            else:
+                ax1.add_patch(patches.Circle((x, y), r, color=colors[1], alpha = float(options.alpha)))
         for x,y in zip(ix,iy):
-            #ax1.add_patch(patches.Circle((x, y), r, color=colors[2], alpha = float(options.alpha)))
-            ax1.add_patch(patches.Rectangle((x-s/2.0, y-s/2.0), s/math.cos(y), s, color=colors[2], alpha = float(options.alpha)))
+            if options.rectangular:
+                ax1.add_patch(patches.Rectangle((x-s/2.0, y-s/2.0), s/math.cos(y), s, color=colors[2], alpha = float(options.alpha)))
+            else:
+                ax1.add_patch(patches.Circle((x, y), r, color=colors[2], alpha = float(options.alpha)))
         for x,y in zip(zx,zy):
-            #ax1.add_patch(patches.Circle((x, y), r, color=colors[3], alpha = float(options.alpha)))
-            ax1.add_patch(patches.Rectangle((x-s/2.0, y-s/2.0), s/math.cos(y), s, color=colors[3], alpha = float(options.alpha)))
+            if options.rectangular:
+                ax1.add_patch(patches.Rectangle((x-s/2.0, y-s/2.0), s/math.cos(y), s, color=colors[3], alpha = float(options.alpha)))
+            else:
+                ax1.add_patch(patches.Circle((x, y), r, color=colors[3], alpha = float(options.alpha)))
         for x,y in zip(yx,yy):
-            #ax1.add_patch(patches.Circle((x, y), r, color=colors[4], alpha = float(options.alpha)))
-            ax1.add_patch(patches.Rectangle((x-s/2.0, y-s/2.0), s/math.cos(y), s, color=colors[4], alpha = float(options.alpha)))
+            if options.rectangular:
+                ax1.add_patch(patches.Rectangle((x-s/2.0, y-s/2.0), s/math.cos(y), s, color=colors[4], alpha = float(options.alpha)))
+            else:
+                ax1.add_patch(patches.Circle((x, y), r, color=colors[4], alpha = float(options.alpha)))
         for x,y in zip(wx,wy):
-            #ax1.add_patch(patches.Circle((x, y), r, color=colors[5], alpha = float(options.alpha)))
-            ax1.add_patch(patches.Rectangle((x-s/2.0, y-s/2.0), s/math.cos(y), s, color=colors[5], alpha = float(options.alpha)))
+            if options.rectangular:
+                ax1.add_patch(patches.Rectangle((x-s/2.0, y-s/2.0), s/math.cos(y), s, color=colors[5], alpha = float(options.alpha)))
+            else:
+                ax1.add_patch(patches.Circle((x, y), r, color=colors[5], alpha = float(options.alpha)))
         for x,y in zip(cx,cy):
-            ax1.add_patch(patches.Rectangle((x-s/2.0, y-s/2.0), s/math.cos(y), s, color=colors[6], alpha = float(options.alpha)))
+            if options.rectangular:
+                ax1.add_patch(patches.Rectangle((x-s/2.0, y-s/2.0), s/math.cos(y), s, color=colors[6], alpha = float(options.alpha)))
+            else:
+                ax1.add_patch(patches.Circle((x, y), r, color=colors[6], alpha = float(options.alpha)))
         for x,y in zip(ox,oy):
-            ax1.add_patch(patches.Rectangle((x-s/2.0, y-s/2.0), s/math.cos(y), s, color=colors[7], alpha = float(options.alpha)))
+            if options.rectangular:
+                ax1.add_patch(patches.Rectangle((x-s/2.0, y-s/2.0), s/math.cos(y), s, color=colors[7], alpha = float(options.alpha)))
+            else:
+                ax1.add_patch(patches.Circle((x, y), r, color=colors[6], alpha = float(options.alpha)))
     else:
         ax1.scatter(gx,gy, alpha=float(options.alpha), edgecolors='none', color=colors[0], s = float(options.pointsize))
         ax1.scatter(rx,ry, alpha=float(options.alpha), edgecolors='none', color=colors[1], s = float(options.pointsize))
@@ -220,7 +249,7 @@ def doPlot(options, objects, plotNumber = 111, alpha = 0.2, minMJD = 0.0, maxMJD
     #leg = ax1.legend([gleg, rleg, ileg, zleg, yleg], ['g', 'r', 'i', 'z', 'y'], loc='upper right', scatterpoints = 1, prop = {'size':6})
     #leg = ax1.legend([gleg, rleg, ileg, zleg, yleg, wleg], ['g', 'r', 'i', 'z', 'y', 'w'], loc='upper right', scatterpoints = 1, prop = {'size':4})
     #leg = ax1.legend([gleg, rleg, ileg, zleg, yleg, wleg, cleg, oleg], ['g', 'r', 'i', 'z', 'y', 'w', 'c', 'o'], loc='upper right', scatterpoints = 1, prop = {'size':4})
-    leg = ax1.legend([wleg, yleg, cleg, gleg], ['MLO', 'HKO', 'STH', 'CHL'], loc='upper right', scatterpoints = 1, prop = {'size':4})
+    #leg = ax1.legend([wleg, yleg, cleg, gleg], ['MLO', 'HKO', 'STH', 'CHL'], loc='upper right', scatterpoints = 1, prop = {'size':4})
 
     #leg = ax1.legend([cleg, oleg], ['c', 'o'], loc='upper right', scatterpoints = 1, prop = {'size':4})
 
@@ -302,9 +331,10 @@ def doPlot(options, objects, plotNumber = 111, alpha = 0.2, minMJD = 0.0, maxMJD
     return pl
 
 
-def plotHammerProjection(options, filename, objects, alpha = 0.2, minMJD = 0.0, maxMJD = 60000.0, usePatches = False):
+def plotHammerProjection(options, filename, objects, alpha = 0.2, minMJD = 0.0, maxMJD = 70000.0, usePatches = False):
 
     print (maxMJD -1, maxMJD)
+    print (minMJD, maxMJD)
 #    pl = doPlot(options, objects, plotNumber = 212, alpha = alpha, minMJD = maxMJD - 1, maxMJD = maxMJD)
     pl = doPlot(options, objects, plotNumber = 111, alpha = alpha, minMJD = minMJD, maxMJD = maxMJD, usePatches = usePatches)
     #pl = doPlot(options, objects, plotNumber = 212, alpha = alpha, minMJD = 57168, maxMJD = 57169)

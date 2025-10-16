@@ -349,7 +349,9 @@ if __name__ == "__main__":
 #    data = readGenericDataFile("/Users/kws/lasair/lsst/run_20251009/heatmap_all_detections_minus_diaobjectid0.csv", delimiter=',')
 #    data = readGenericDataFile("/Users/kws/lasair/lsst/run_20251009/heatmap_all_detections_minus_singletons_and_diaobjectid0.csv", delimiter=',')
 #    data = readGenericDataFile("/Users/kws/lasair/lsst/run_20251009/heatmap_all_detections_minus_singletons_and_diaobjectid0_reliability_gt_99.csv", delimiter=',')
-    data = readGenericDataFile("/Users/kws/lasair/lsst/run_20251009/heatmap_all_detections_minus_diaobjectid0_reliability_gt_99.csv", delimiter=',')
+#    data = readGenericDataFile("/Users/kws/lasair/lsst/run_20251009/heatmap_all_detections_minus_diaobjectid0_reliability_gt_99.csv", delimiter=',')
+#    data = readGenericDataFile("/Users/kws/lasair/lsst/run_20251009/heatmap_ddf_only_excluding_diasourceid0.csv", delimiter=',')
+    data = readGenericDataFile("/Users/kws/lasair/lsst/run_20251009/heatmap_ecliptic_only_excluding_diasourceid0.csv", delimiter=',')
 
     values = {}
     for row in data:
@@ -371,7 +373,9 @@ if __name__ == "__main__":
 #    plt.title("All Detections minus diaObjectId = 0 (419,462)")
 #    plt.title("All Detections minus diaObjectId = 0 and minus all singletons (62,424)")
 #    plt.title("All Detections minus diaObjectId = 0 and minus all singletons and reliability > 0.99 (2,709)")
-    plt.title("All Detections minus diaObjectId = 0 and reliability > 0.99 (35,240)")
+#    plt.title("All Detections minus diaObjectId = 0 and reliability > 0.99 (35,240)")
+#    plt.title("All Detections minus diaObjectId = 0 DDF only (175,410)")
+    plt.title("All Detections minus diaObjectId = 0 Ecliptic only (244,052)")
     plt.tight_layout()
     plt.show()
 
