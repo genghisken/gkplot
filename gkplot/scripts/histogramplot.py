@@ -2,7 +2,7 @@
 """Plot histogram to show performance of the specified trained classifier.
 
 Usage:
-  %s <inputFile>... [--delimiter=<delimiter>] [--column=<column>] [--outputFile=<file>] [--binwidth=<binwidth>] [--threshold=<threshold>] [--log] [--xlabel=<xlabel>] [--ylabel=<ylabel>] [--binlower=<binlower>] [--binupper=<binupper>] [--majorticks=<majorticks>] [--minorticks=<minorticks>] [--plotlabel=<plotlabel>] [--panellabel=<panellabel>] [--ylimit=<ylimit>] [--alpha=<alpha>] [--colour=<colour>] [--leglabels=<leglabels>] [--normalise]
+  %s <inputFile>... [--delimiter=<delimiter>] [--column=<column>] [--outputFile=<file>] [--binwidth=<binwidth>] [--threshold=<threshold>] [--log] [--xlabel=<xlabel>] [--ylabel=<ylabel>] [--binlower=<binlower>] [--binupper=<binupper>] [--majorticks=<majorticks>] [--minorticks=<minorticks>] [--plotlabel=<plotlabel>] [--panellabel=<panellabel>] [--ylimit=<ylimit>] [--alpha=<alpha>] [--colour=<colour>] [--leglabels=<leglabels>] [--normalise] [--title=<title>]
   %s (-h | --help)
   %s --version
 
@@ -28,6 +28,7 @@ Options:
   --log                        Plot log(y) instead of y.
   --leglabels=<leglabels>      Legend labels (alternative to using the columns).
   --normalise                  Normalise the histogram.
+  --title=<title>              Plot title.
 
   e.g.:
 
@@ -47,14 +48,14 @@ import numpy as n
 SMALL_SIZE = 14
 MEDIUM_SIZE = 18
 BIGGER_SIZE = 25
-TINY_SIZE = 12
-plt.rc('font', size=SMALL_SIZE)                   # controls default text sizes
-plt.rc('axes', titlesize=MEDIUM_SIZE)            # fontsize of the axes title
-plt.rc('axes', labelsize=MEDIUM_SIZE)           # fontsize of the x and y labels
+TINY_SIZE = 5
+plt.rc('font', size=TINY_SIZE)                   # controls default text sizes
+plt.rc('axes', titlesize=TINY_SIZE)            # fontsize of the axes title
+plt.rc('axes', labelsize=TINY_SIZE)           # fontsize of the x and y labels
 plt.rc('xtick', labelsize=TINY_SIZE)            # fontsize of the tick labels
 plt.rc('ytick', labelsize=TINY_SIZE)            # fontsize of the tick labels
 plt.rc('legend', fontsize=SMALL_SIZE - 1)               # legend fontsize
-plt.rc('figure', titlesize=BIGGER_SIZE)   # fontsize of the figure title
+plt.rc('figure', titlesize=TINY_SIZE)   # fontsize of the figure title
 plt.rcParams["font.family"] = "serif"
 plt.rcParams['mathtext.fontset'] = 'dejavuserif'
 
@@ -99,7 +100,10 @@ def plotHistogram(data, options):
         tl.set_color('k')
 
     ax1.set_xlabel(options.xlabel)
-    #ax1.set_title('Classifier performance.')
+
+    if options.title:
+        ax1.set_title(options.title)
+
     if len(columns) > 1:
         ax1.legend(columns, loc=1, frameon=False)
     elif leglabels is not None:
