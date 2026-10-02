@@ -2,7 +2,7 @@
 """Do a generic scatter plot.
 
 Usage:
-  %s <inputFile>... [--x=<x>] [--y=<y>] [--yerror=<yerror>] [--xlower=<xlower>] [--xupper=<xupper>] [--ylower=<ylower>] [--yupper=<yupper>] [--outputFile=<file>] [--threshold=<threshold>] [--log] [--xlabel=<xlabel>] [--ylabel=<ylabel>] [--xmajorticks=<xmajorticks>] [--xminorticks=<xminorticks>] [--ymajorticks=<ymajorticks>] [--yminorticks=<yminorticks>] [--plotlabel=<plotlabel>] [--plotlabelpos=<plotlabelpos>] [--panellabel=<panellabel>] [--panellabelpos=<panellabelpos>] [--alpha=<alpha>] [--pointsize=<pointsize>] [--mjdXaxis] [--addSecondaryTimeXAxis] [--grid] [--colour=<colour>] [--invert] [--tight] [--figsize=<figsize>] [--header=<header>] [--normalise] [--line] [--linewidth=<linewidth>] [--error] [--errorthick=<errorthick>] [--delimiter=<delimiter>] [--legend] [--legendlabels=<legendlabels>] [--equalaspect] [--title=<title>]
+  %s <inputFile>... [--x=<x>] [--y=<y>] [--yerror=<yerror>] [--xlower=<xlower>] [--xupper=<xupper>] [--ylower=<ylower>] [--yupper=<yupper>] [--outputFile=<file>] [--threshold=<threshold>] [--log] [--xlabel=<xlabel>] [--ylabel=<ylabel>] [--xmajorticks=<xmajorticks>] [--xminorticks=<xminorticks>] [--ymajorticks=<ymajorticks>] [--yminorticks=<yminorticks>] [--plotlabel=<plotlabel>] [--plotlabelpos=<plotlabelpos>] [--panellabel=<panellabel>] [--panellabelpos=<panellabelpos>] [--alpha=<alpha>] [--pointsize=<pointsize>] [--mjdXaxis] [--addSecondaryTimeXAxis] [--grid] [--colour=<colour>] [--xinvert] [--yinvert] [--tight] [--figsize=<figsize>] [--header=<header>] [--normalise] [--line] [--linewidth=<linewidth>] [--error] [--errorthick=<errorthick>] [--delimiter=<delimiter>] [--legend] [--leglabels=<leglabels>] [--equalaspect] [--title=<title>]
   %s (-h | --help)
   %s --version
 
@@ -41,9 +41,10 @@ Options:
   --errorthick=<errorthick>         Thickness of the error line and cap. [default: 0.5]
   --grid                            Add a grid
   --legend                          Add a legend
-  --legendlabels=<legendlabels>     Legend labels. Comma separated, no spaces.
+  --leglabels=<leglabels>           Legend labels. Comma separated, no spaces.
   --log                             Plot log(y) instead of y.
-  --invert                          invert y axis.
+  --xinvert                         invert x axis.
+  --yinvert                         invert y axis.
   --tight                           tight layout.
   --figsize=<figsize>               figure size, comma separated, no spaces [default: 6,3]
   --delimiter=<delimiter>           Delimiter to use [default: ,].
@@ -51,18 +52,20 @@ Options:
   --title=<title>                   Plot title.
 
 E.g.:
-   %s ~/atlas/dophot/ATLAS20ymv_dophot_o.txt ~/atlas/dophot/ATLAS20ymv_dophot_c.txt --x=mjd --y=mag --yerror=dminst --invert --xlower=59070 --xupper=59200 --ylower=15.5 --yupper=18.5 --tight --alpha=1 --pointsize=2 --xmajorticks=20 --xminorticks=2 --outputFile=/tmp/ATLAS20ymv_lc.png --error
+   %s ~/atlas/dophot/ATLAS20ymv_dophot_o.txt ~/atlas/dophot/ATLAS20ymv_dophot_c.txt --x=mjd --y=mag --yerror=dminst --yinvert --xlower=59070 --xupper=59200 --ylower=15.5 --yupper=18.5 --tight --alpha=1 --pointsize=2 --xmajorticks=20 --xminorticks=2 --outputFile=/tmp/ATLAS20ymv_lc.png --error
 
-   %s ~/atlas/dophot/galactic_centre_vs_o.txt --x=mjd --y=mag --yerror=dminst --invert --xlower=57700 --xupper=59200 --ylower=12.5 --yupper=18.5 --tight --alpha=1 --pointsize=2 --xmajorticks=200 --xminorticks=20 --outputFile=/tmp/galactic_centre_lc.png --error
+   %s ~/atlas/dophot/galactic_centre_vs_o.txt --x=mjd --y=mag --yerror=dminst --yinvert --xlower=57700 --xupper=59200 --ylower=12.5 --yupper=18.5 --tight --alpha=1 --pointsize=2 --xmajorticks=200 --xminorticks=20 --outputFile=/tmp/galactic_centre_lc.png --error
 
    %s /tmp/tAT2023plg_20231105_Gr13_Free_slit1.0_1_f.asci --x='wavelength' --y='flux' --xlower=3500 --xupper=9500 --ylower=-0.3 --yupper=1.1 --outputFile=/tmp/AT2023plg.jpeg --xlabel=wavelength --ylabel='normalised flux' --xmajorticks=500 --xminorticks=100 --ymajorticks=0.1 --yminorticks=0.01 --header='wavelength flux' --normalise --line --linewidth=0.25 --colour=black --alpha=1.0 --delimiter=' ' --title=AT2023plg
 
-   %s ~/atlas/dophot/232.6801_21.1287_o.dph ~/atlas/dophot/232.6801_21.1287_c.dph ~/atlas/dophot/Q2326801+211287_o.lc ~/atlas/dophot/Q2326801+211287_c.lc --x=mjd --y=m --yerror=dminst --invert --xlower=57070 --xupper=60750 --ylower=14 --yupper=20.5 --tight --alpha=1 --xmajorticks=200 --xminorticks=20 --error --delimiter=' ' --outputFile=/tmp/232.6801_21.1287.dph.png --colour=orange,cyan,red,blue
+   %s ~/atlas/dophot/232.6801_21.1287_o.dph ~/atlas/dophot/232.6801_21.1287_c.dph ~/atlas/dophot/Q2326801+211287_o.lc ~/atlas/dophot/Q2326801+211287_c.lc --x=mjd --y=m --yerror=dminst --yinvert --xlower=57070 --xupper=60750 --ylower=14 --yupper=20.5 --tight --alpha=1 --xmajorticks=200 --xminorticks=20 --error --delimiter=' ' --outputFile=/tmp/232.6801_21.1287.dph.png --colour=orange,cyan,red,blue
 
-   %s /Users/kws/soxs-workspace-20250604/reduced/2025-06-04/soxs-stare/20250605T075734_VIS_1X1_1_STARE_SLIT1.0_1800.0S_SOXS_SN2025ML_EXTRACTED_MERGED.txt /Users/kws/soxs-workspace-20250604/reduced/2025-06-04/soxs-stare/20250605T083853_VIS_1X1_1_STARE_SLIT1.0_2400.0S_SOXS_SN2025ML_EXTRACTED_MERGED.txt /Users/kws/soxs-workspace-20250604/reduced/2025-06-04/soxs-stare/20250605T092314_VIS_1X1_1_STARE_SLIT5.0_2400.0S_SOXS_SN2025ML_EXTRACTED_MERGED.txt --x=WAVE --y=FLUX_COUNTS --line --linewidth=0.1 --colour=black,red,blue --alpha=1.0,1.0,1.0 --xlabel='wavelength (nm)' --ylabel=flux --delimiter=' ' --title=SN2025mlo --legend --legendlabels='1800s slit=1.0','2400s slit=1.0','2400s slit=5.0'
+   %s /Users/kws/soxs-workspace-20250604/reduced/2025-06-04/soxs-stare/20250605T075734_VIS_1X1_1_STARE_SLIT1.0_1800.0S_SOXS_SN2025ML_EXTRACTED_MERGED.txt /Users/kws/soxs-workspace-20250604/reduced/2025-06-04/soxs-stare/20250605T083853_VIS_1X1_1_STARE_SLIT1.0_2400.0S_SOXS_SN2025ML_EXTRACTED_MERGED.txt /Users/kws/soxs-workspace-20250604/reduced/2025-06-04/soxs-stare/20250605T092314_VIS_1X1_1_STARE_SLIT5.0_2400.0S_SOXS_SN2025ML_EXTRACTED_MERGED.txt --x=WAVE --y=FLUX_COUNTS --line --linewidth=0.1 --colour=black,red,blue --alpha=1.0,1.0,1.0 --xlabel='wavelength (nm)' --ylabel=flux --delimiter=' ' --title=SN2025mlo --legend --leglabels='1800s slit=1.0','2400s slit=1.0','2400s slit=5.0'
+   %s ~/atlas/masslc/20260919_niamh_stars/LC/02/1SWASP_J180532.93+493218.0.lc --x='##MJD' --y=m --yinvert --xlower=57700 --xupper=61400 --ylower=10.5 --yupper=18.5 --tight --alpha=1 --pointsize=0.2 --xmajorticks=1000 --xminorticks=100 --outputFile=/tmp/test.png --delimiter=' '
+
 """
 import sys
-__doc__ = __doc__ % (sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0])
+__doc__ = __doc__ % (sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0], sys.argv[0])
 from docopt import docopt
 import os, shutil, re, csv, subprocess
 from gkutils.commonutils import Struct, cleanOptions, readGenericDataFile
@@ -86,14 +89,14 @@ colours = ['orange', 'cyan']
 SMALL_SIZE = 14
 MEDIUM_SIZE = 18
 BIGGER_SIZE = 25
-TINY_SIZE = 12
+TINY_SIZE = 5
 plt.rc('font', size=SMALL_SIZE)                   # controls default text sizes
-plt.rc('axes', titlesize=TINY_SIZE)            # fontsize of the axes title
-plt.rc('axes', labelsize=TINY_SIZE)           # fontsize of the x and y labels
-plt.rc('xtick', labelsize=TINY_SIZE)            # fontsize of the tick labels
-plt.rc('ytick', labelsize=TINY_SIZE)            # fontsize of the tick labels
-plt.rc('legend', fontsize=TINY_SIZE)               # legend fontsize
-plt.rc('figure', titlesize=BIGGER_SIZE)   # fontsize of the figure title
+plt.rc('axes', titlesize=SMALL_SIZE - 8)            # fontsize of the axes title
+plt.rc('axes', labelsize=SMALL_SIZE - 6)           # fontsize of the x and y labels
+plt.rc('xtick', labelsize=SMALL_SIZE - 6)            # fontsize of the tick labels
+plt.rc('ytick', labelsize=SMALL_SIZE - 6)            # fontsize of the tick labels
+plt.rc('legend', fontsize=SMALL_SIZE - 8)               # legend fontsize
+plt.rc('figure', titlesize=SMALL_SIZE)   # fontsize of the figure title
 plt.rcParams["font.family"] = "serif"
 plt.rcParams['mathtext.fontset'] = 'dejavuserif'
 
@@ -120,7 +123,7 @@ def plotScatter(data, options):
     fig = plt.figure(figsize=(float(figsize[0]), float(figsize[1])))
 
     if options.legend:
-        plotlabels = options.legendlabels.split(',')
+        plotlabels = options.leglabels.split(',')
 
     #ax1 = fig.add_subplot(111)
 
@@ -157,7 +160,7 @@ def plotScatter(data, options):
                 legends.append(ax1.errorbar(xarray, yarray, fmt='o', yerr=yerrorarray, color=colour, markersize = float(options.pointsize), alpha = float(alpha), elinewidth=float(options.errorthick), capsize=(float(options.errorthick)*2), capthick=float(options.errorthick)))
                 #ax1.errorbar(xarray, yarray, fmt='o', yerr=yerrorarray, color=colour, markersize = float(options.pointsize), fillstyle='full', alpha = float(alpha))
             else:
-                ax1.scatter(xarray, yarray, marker='o', alpha = float(alpha), color=colour, s = float(options.pointsize), edgecolors='none')
+                ax1.scatter(xarray, yarray, marker='o', alpha = float(alpha), color=colour, s = float(options.pointsize), edgecolors='none', label=plotlabels[i] if options.legend else None)
 
         if options.mjdXaxis and options.addSecondaryTimeXAxis:
             # Assumes x axis is MJD
@@ -214,17 +217,20 @@ def plotScatter(data, options):
     if options.log:
         ax1.set_yscale('log')
 
-    if options.invert:
+    if options.xinvert:
+        ax1.invert_xaxis() 
+
+    if options.yinvert:
         ax1.invert_yaxis() 
 
     if options.threshold is not None:
         ax1.axvline(x=float(options.threshold),color='k',linestyle='--')
 
-#    if options.legend:
-#        ax1.legend(legends, options.legendlabels.split(','), loc='upper right', scatterpoints = 1, prop = {'size':4})
+    if options.legend:
+        ax1.legend(legends, options.leglabels.split(','), loc='upper right', scatterpoints = 1, prop = {'size':4})
 
     if options.legend:
-        leg = ax1.legend(loc='upper right', scatterpoints = 1)
+        leg = ax1.legend(loc='upper right', scatterpoints = 1, markerscale=5)
         # Thicken the lines in the legend
         for legend_line in leg.legend_handles:
             legend_line.set_linewidth(1)
